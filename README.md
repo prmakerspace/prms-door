@@ -3,18 +3,18 @@
 
 RFID door lock for our Makerspace
 
-###Usage:
-####To enter:
+### Usage:
+#### To enter:
 1.  scan card at door
 1.  door unlocks
 1.  enter; door relocks after 15 seconds
 
-####To exit:
+#### To exit:
 1.  scan card at door
 1.  door unlocks
 1.  exit; door relocks after 15 seconds
 
-###To add a new member:
+### To add a new member:
 1.  ssh into the raspberry pi
 1.  `cd prms-door`
 1.  `python writeCard.py` to get a list of possible users

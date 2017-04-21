@@ -347,7 +347,7 @@ class MFRC522:
       else:
         return backData
   
-  def MFRC522_Write(self, blockAddr, writeData):
+  def MFRC522_Write(self, blockAddr, writeData, verbose=True):
     buff = []
     buff.append(self.PICC_WRITE)
     buff.append(blockAddr)
@@ -357,8 +357,10 @@ class MFRC522:
     (status, backData, backLen) = self.MFRC522_ToCard(self.PCD_TRANSCEIVE, buff)
     if not(status == self.MI_OK) or not(backLen == 4) or not((backData[0] & 0x0F) == 0x0A):
         status = self.MI_ERR
-    
-    print str(backLen)+" backdata &0x0F == 0x0A "+str(backData[0]&0x0F)
+
+    if verbose:
+      print str(backLen)+" backdata &0x0F == 0x0A "+str(backData[0]&0x0F)
+      
     if status == self.MI_OK:
         i = 0
         buf = []

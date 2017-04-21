@@ -140,13 +140,26 @@ while continue_reading:
             for i in args.id:
                 data.append(int(i))
 
+            cardreader.MFRC522_Write(8, data, False)
+
+            #read data to confirm
             data = cardreader.MFRC522_Read(8, False)
             cardreader.MFRC522_StopCrypto1()
             memberId = ''.join(map(str, data[len(data)/2:]))
+
+            if memberId != args.id:
+                print "Write error; unable to confirm member id written properly.  Please try again."
+                print "Expected: " + args.id + "\t\tFound: " + memberId
+                print "If this error continues, please file a bug."
+                sys.exit()
             
+            curs.execute("""INSERT INTO event_log VALUES (%s, %s, CURRENT_TIMESTAMP)""",(args.id, 'card written'))
+            curs.execute ("""UPDATE thelist SET has_card=true, last_updated=CURRENT_TIMESTAMP WHERE id=%s""",(args.id))
+            db.commit()
             print("Id " + memberId + " for '" + name + "' confirmed written to card.")
 
             # Make sure to stop reading for cards
             continue_reading = False
+            db.close()
         else:
             print "Card authentication error"
