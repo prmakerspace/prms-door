@@ -1,0 +1,12 @@
+[db]
+server:     localhost
+user:       username
+password:   password
+database:   members
+
+[wa]
+client:     wildApricotClientId
+key:        wildApricotClientKey
+user:       ApiUser
+password:   ApiPassword
+
