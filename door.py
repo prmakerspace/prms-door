@@ -60,8 +60,6 @@ cardreader = MFRC522.MFRC522()
 # rotate to locked position when powered on initially
 door_lock()
 
-print("sql server: " + config.get('db', 'server'))
-
 db   = MySQLdb.connect(
   config.get('db', 'server'),
   config.get('db', 'user'),
@@ -89,7 +87,6 @@ while(continue_reading):
 
     status = cardreader.MFRC522_Auth(cardreader.PICC_AUTHENT1A, 8, key, uid)
 
-    # @TODO: lookup info in db
     if status == cardreader.MI_OK:
       data = cardreader.MFRC522_Read(8, False)
       print(data)
