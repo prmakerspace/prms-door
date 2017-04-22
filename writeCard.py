@@ -126,10 +126,10 @@ while continue_reading:
         cardreader.MFRC522_SelectTag(uid, False)
 
         # Authenticate
-        status = cardreader.MFRC522_Auth(cardreader.PICC_AUTHENT1A, 8, key, uid)
+        card_status = cardreader.MFRC522_Auth(cardreader.PICC_AUTHENT1A, 8, key, uid)
 
         # Check if authenticated
-        if status == cardreader.MI_OK:
+        if card_status == cardreader.MI_OK:
             # Variable for the data to write
             data = []
 
@@ -162,4 +162,4 @@ while continue_reading:
             continue_reading = False
             db.close()
         else:
-            print "Card authentication error"
+            print "Card authentication error - status: "+str(card_status)

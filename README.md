@@ -14,12 +14,12 @@ RFID door lock for our Makerspace
 1.  door unlocks
 1.  exit; door relocks after 15 seconds
 
-### To add a new member:
+#### To add a new member:
 1.  ssh into the raspberry pi
 1.  `cd prms-door`
-1.  `writeCard.py` to get a list of possible users
-1.  `writeCard.py -h` to get a list of options (to replace a card for a user)
-1.  `writeCard.py memberId` to write a member's id to a card; follow on-screen instructions
+1.  `./writeCard.py` to get a list of possible users
+1.  `./writeCard.py -h` to get a list of options (to replace a card for a user)
+1.  `./writeCard.py memberId` to write a member's id to a card; follow on-screen instructions
 1.  test the new card
 
 ## Setup (big picture, details to come):
