@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import WaApi
 import urllib.parse
 import json
@@ -75,7 +77,7 @@ def update_member_db(contact):
 
 
 config = configparser.ConfigParser()
-config.read('door.ini')
+config.read("/home/pi/prms-door/door.ini")
 
 # How to obtain application credentials:
 # https://help.wildapricot.com/display/DOC/API+V2+authentication#APIV2authentication-Authorizingyourapplication

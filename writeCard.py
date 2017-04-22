@@ -43,7 +43,7 @@ args = parser.parse_args()
 
 # parse the config:
 config = ConfigParser.ConfigParser()
-config.read("door.ini")
+config.read("/home/pi/prms-door/door.ini")
 
 # connect the database
 db   = MySQLdb.connect(

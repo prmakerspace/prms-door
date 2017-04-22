@@ -1,5 +1,5 @@
 # prms-door
-##Powell River Makerspace Door Project
+## Powell River Makerspace Door Project
 
 RFID door lock for our Makerspace
 
@@ -17,10 +17,25 @@ RFID door lock for our Makerspace
 ### To add a new member:
 1.  ssh into the raspberry pi
 1.  `cd prms-door`
-1.  `python writeCard.py` to get a list of possible users
-1.  `python writeCard.py -h` to get a list of options (to replace a card for a user)
-1.  `python writeCard.py memberId` to write a member's id to a card; follow on-screen instructions
+1.  `writeCard.py` to get a list of possible users
+1.  `writeCard.py -h` to get a list of options (to replace a card for a user)
+1.  `writeCard.py memberId` to write a member's id to a card; follow on-screen instructions
 1.  test the new card
+
+## Setup (big picture, details to come):
+1.  Check out from git
+1.  Install the pigpio library from abyz.co.uk/rpi/pigpio/
+1.  Install any other missing modules.  Note that we include a modified MFRC522 library.
+1.  Change to be executable:
+    chmod a+x door.py
+    chmod a+x fetchMembers.py
+    chmod a+x writeCard.py
+1.  Connect card reader as documented on the internet - we use a standard connection.
+1.  Connect the servo to GPIO pin 14, 5v, and ground.
+1.  Add cron entries via `sudo crontab -e`
+    @reboot pigpiod
+    @reboot sleep 30 && /home/pi/prms-door/door.py &
+    @daily  sleep 30 && /home/pi/prms-door/fetchMembers.py &
 
 Required features:
 1.  current access control (keys) still work (needs testing)

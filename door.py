@@ -1,3 +1,4 @@
+#!/usr/bin/python2
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
 
@@ -26,7 +27,7 @@ pi.set_mode(servo_gpio, pigpio.OUTPUT)
 continue_reading = True
 
 config = ConfigParser.ConfigParser()
-config.read("door.ini")
+config.read("/home/pi/prms-door/door.ini")
 
 def door_lock():
   print("Locking..")
