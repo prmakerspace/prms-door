@@ -69,6 +69,8 @@ if not args.id:
     for row in result:
         print(str(row[0]) + "\t" + row[1] + "\t\t" + row[2])
 
+    print("Use -h to show all options.")
+
     sys.exit()
 
 # id, verify and write card
@@ -108,7 +110,7 @@ while continue_reading:
 
     # If a card is found
     if status == cardreader.MI_OK:
-        print "Card detected"
+        print "Card detected, preparing to write."
     
     # Get the UID of the card
     (status,uid) = cardreader.MFRC522_Anticoll()
