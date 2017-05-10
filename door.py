@@ -16,10 +16,9 @@ lock_timeout = 15  # timeout in seconds
 
 # servo config
 servo_gpio   = 14     # Servos connected to gpio 14
-direction    = 1
 pulse_width  = 1500
-pos_unlocked = 2400
-pos_locked   = 800
+pos_locked = 2400
+pos_unlocked   = 800
 
 pi = pigpio.pi() # Connect to local Pi.
 pi.set_mode(servo_gpio, pigpio.OUTPUT)
