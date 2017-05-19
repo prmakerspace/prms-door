@@ -1,11 +1,8 @@
-#!/usr/bin/env python
-# -*- coding: utf8 -*-
-
 import RPi.GPIO as GPIO
 import spi
 import signal
 import time
-
+  
 class MFRC522:
   NRSTPD = 22
   
@@ -107,10 +104,9 @@ class MFRC522:
     
   serNum = []
   
-  def __init__(self, dev='/dev/spidev0.0', spd=1000000):
-    spi.openSPI(device=dev,speed=spd)
+  def __init__(self,spd=1000000):
+    spi.openSPI(speed=spd)
     GPIO.setmode(GPIO.BOARD)
-    GPIO.setwarnings(False)
     GPIO.setup(22, GPIO.OUT)
     GPIO.output(self.NRSTPD, 1)
     self.MFRC522_Init()
@@ -118,10 +114,10 @@ class MFRC522:
   def MFRC522_Reset(self):
     self.Write_MFRC522(self.CommandReg, self.PCD_RESETPHASE)
   
-  def Write_MFRC522(self, addr, val):
+  def Write_MFRC522(self,addr,val):
     spi.transfer(((addr<<1)&0x7E,val))
   
-  def Read_MFRC522(self, addr):
+  def Read_MFRC522(self,addr):
     val = spi.transfer((((addr<<1)&0x7E) | 0x80,0))
     return val[1]
   
@@ -279,7 +275,7 @@ class MFRC522:
     buf.append(self.PICC_SElECTTAG)
     buf.append(0x70)
     i = 0
-    while i<4:
+    while i<5:
       buf.append(serNum[i])
       i = i + 1
     pOut = self.CalulateCRC(buf)
@@ -330,7 +326,7 @@ class MFRC522:
   def MFRC522_StopCrypto1(self):
     self.ClearBitMask(self.Status2Reg, 0x08)
 
-  def MFRC522_Read(self, blockAddr, display=True):
+  def MFRC522_Read(self, blockAddr, verbose = True):
     recvData = []
     recvData.append(self.PICC_READ)
     recvData.append(blockAddr)
@@ -342,11 +338,12 @@ class MFRC522:
       print "Error while reading!"
     i = 0
     if len(backData) == 16:
-      if display:
-        print "Sector "+str(blockAddr)+" "+str(backData)
-      else:
-        return backData
-  
+      if verbose:
+        print "Sector "+str(blockAddr)+", Data:"+str(backData)
+      return backData
+    else:
+      print "Odd backData length: " + str(backData)  
+
   def MFRC522_Write(self, blockAddr, writeData, verbose=True):
     buff = []
     buff.append(self.PICC_WRITE)
@@ -357,10 +354,9 @@ class MFRC522:
     (status, backData, backLen) = self.MFRC522_ToCard(self.PCD_TRANSCEIVE, buff)
     if not(status == self.MI_OK) or not(backLen == 4) or not((backData[0] & 0x0F) == 0x0A):
         status = self.MI_ERR
-
+    
     if verbose:
       print str(backLen)+" backdata &0x0F == 0x0A "+str(backData[0]&0x0F)
-      
     if status == self.MI_OK:
         i = 0
         buf = []

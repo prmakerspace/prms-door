@@ -142,11 +142,13 @@ while continue_reading:
             for i in args.id:
                 data.append(int(i))
 
-            cardreader.MFRC522_Write(8, data, False)
+            cardreader.MFRC522_Write(8, data, True)
 
             #read data to confirm
-            data = cardreader.MFRC522_Read(8, False)
-            cardreader.MFRC522_StopCrypto1()
+            data = cardreader.MFRC522_Read(8, True)
+            print("written, card data read:")
+            print(str(data))
+	    cardreader.MFRC522_StopCrypto1()
             memberId = ''.join(map(str, data[len(data)/2:]))
 
             if memberId != args.id:
