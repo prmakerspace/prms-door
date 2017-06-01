@@ -14,6 +14,7 @@ import logging
 
 # system config
 lock_timeout = 15  # timeout in seconds
+logfile = '/home/pi/prms-door/door.log'
 
 # servo config
 servo_gpio   = 15     # Servos connected to gpio 14
@@ -29,7 +30,14 @@ continue_reading = True
 config = ConfigParser.ConfigParser()
 config.read("/home/pi/prms-door/door.ini")
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    filename=logfile,
+    filemode='a',
+    format="%(asctime)s, %(levelname)s: %(message)s",
+    datefmt='%Y-%m-%d %H:%M:%S',
+    level=logging.DEBUG)
+
+logging.info('Starting card reader')
 logger = logging.getLogger(__name__)
 
 def door_lock():
@@ -98,8 +106,14 @@ while(continue_reading):
       logger.debug('read card data %s', data)
       cardreader.MFRC522_StopCrypto1()
       logger.debug('converting card data to member id')
-      memberId = ''.join(map(str, data[len(data)/2:]))
-      logger.debug('read member id %s', memberId)
+      try:
+        memberId = ''.join(map(str, data[len(data)/2:]))
+        logger.debug('read member id %s', memberId)
+      except Exception as e:
+        logger.debug('Failure of some type parsing card data')
+        logger.debug(str(e))
+        memberId = 'FAILURE'
+        pass
 
       try:
         curs.execute("""SELECT account_status, name FROM thelist WHERE id=%s""", (memberId,))
