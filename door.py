@@ -10,12 +10,13 @@ import RPi.GPIO as GPIO
 import signal
 import MySQLdb
 import ConfigParser
+import logging
 
 # system config
 lock_timeout = 15  # timeout in seconds
 
 # servo config
-servo_gpio   = 14     # Servos connected to gpio 14
+servo_gpio   = 15     # Servos connected to gpio 14
 pulse_width  = 1500
 pos_locked = 2400
 pos_unlocked   = 800
@@ -28,20 +29,23 @@ continue_reading = True
 config = ConfigParser.ConfigParser()
 config.read("/home/pi/prms-door/door.ini")
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 def door_lock():
-  print("Locking..")
+  logger.debug("Locking..")
   pi.set_servo_pulsewidth(servo_gpio, pos_locked)
   time.sleep(2)
 
 def door_unlock():
-  print("Unlocking.")
+  logger.debug("Unlocking.")
   pi.set_servo_pulsewidth(servo_gpio, pos_unlocked)
   time.sleep(2)
 
 # capture SIGINT for cleanup when script is aborted
 def end_read(signal,frame):
   global continue_reading
-  print ("Ctrl+C captured, ending read, locking door.")
+  logger.debug("Ctrl+C captured, ending read, locking door.")
   continue_reading = False;
   door_lock()
   GPIO.cleanup()
@@ -78,7 +82,9 @@ while(continue_reading):
 
   if status == cardreader.MI_OK:
     uid_string = str(uid[0])+","+str(uid[1])+","+str(uid[2])+","+str(uid[3])
-    
+ 
+    logger.debug('read from card uid: %s', uid_string);
+   
     # default key for auth
     key = [0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
 
@@ -89,16 +95,17 @@ while(continue_reading):
 
     if status == cardreader.MI_OK:
       data = cardreader.MFRC522_Read(8, False)
-      print(data)
+      logger.debug('read card data %s', data)
       cardreader.MFRC522_StopCrypto1()
+      logger.debug('converting card data to member id')
       memberId = ''.join(map(str, data[len(data)/2:]))
-      print(memberId)
+      logger.debug('read member id %s', memberId)
 
       try:
         curs.execute("""SELECT account_status, name FROM thelist WHERE id=%s""", (memberId,))
       except Exception as e:
-        print ("Error - could not fetch updated date/time from member list for id " + memberId)
-        print(str(e))
+        logger.error("Error - could not fetch updated date/time from member list for id " + memberId)
+        logger.debug(str(e))
         
       if curs.rowcount==1:
         account_status, name = curs.fetchone()
@@ -106,18 +113,17 @@ while(continue_reading):
           valid_card = True
           curs.execute("""INSERT INTO event_log VALUES (%s, %s, CURRENT_TIMESTAMP)""",(memberId, 'card swipe'))
         else:
-          print("status is not 'Active' - is " + str(account_status))
+          logger.info("Member %s status is not 'Active' (is %s)", memberId, str(account_status))
       else:
-        print("Could not find member in list")
+        logger.info("Could not find member %s in list.", memberId)
           
-
   # @TODO: trigger on inside input
   inside_input = get_inside_input()
   
   if (valid_card or inside_input):
     # @TODO: record video on trigger
     # unlock
-    print("Valid input.")
+    logger.debug("Valid input.")
     door_unlock()
 
     # @TODO: handle door being open - needs a sensor
@@ -125,7 +131,6 @@ while(continue_reading):
     time.sleep(lock_timeout)
 
     # lock again
-    print("Relocking.")
     door_lock()
 
 pi.stop()
