@@ -315,9 +315,9 @@ class MFRC522:
     (status, backData, backLen) = self.MFRC522_ToCard(self.PCD_AUTHENT,buff)
 
     # Check if an error occurred
-    if not(status == self.MI_OK):
+    if not(status == self.MI_OK) and verbose:
       print "AUTH ERROR!!"
-    if not (self.Read_MFRC522(self.Status2Reg) & 0x08) != 0:
+    if not (self.Read_MFRC522(self.Status2Reg) & 0x08) != 0 and verbose:
       print "AUTH ERROR(status2reg & 0x08) != 0"
 
     # Return the status
@@ -334,7 +334,7 @@ class MFRC522:
     recvData.append(pOut[0])
     recvData.append(pOut[1])
     (status, backData, backLen) = self.MFRC522_ToCard(self.PCD_TRANSCEIVE, recvData)
-    if not(status == self.MI_OK):
+    if not(status == self.MI_OK) and verbose:
       print "Error while reading!"
     i = 0
     if len(backData) == 16:
@@ -342,7 +342,8 @@ class MFRC522:
         print "Sector "+str(blockAddr)+", Data:"+str(backData)
       return backData
     else:
-      print "Odd backData length: " + str(backData)  
+      if verbose:
+        print "Odd backData length: " + str(backData)  
 
   def MFRC522_Write(self, blockAddr, writeData, verbose=True):
     buff = []
