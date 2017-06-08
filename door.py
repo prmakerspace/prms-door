@@ -72,15 +72,6 @@ cardreader = MFRC522.MFRC522()
 # rotate to locked position when powered on initially
 door_lock()
 
-db   = MySQLdb.connect(
-  config.get('db', 'server'),
-  config.get('db', 'user'),
-  config.get('db', 'password'),
-  config.get('db', 'database')
-)
-db.autocommit(True)
-curs = db.cursor()
-
 while(continue_reading):
   valid_card = False
 
@@ -115,11 +106,21 @@ while(continue_reading):
         memberId = 'FAILURE'
         pass
 
+      db   = MySQLdb.connect(
+        config.get('db', 'server'),
+        config.get('db', 'user'),
+        config.get('db', 'password'),
+        config.get('db', 'database')
+      )
+      db.autocommit(True)
+      curs = db.cursor()
+
       try:
         curs.execute("""SELECT account_status, name FROM thelist WHERE id=%s""", (memberId,))
       except Exception as e:
         logger.error("Error - could not fetch updated date/time from member list for id " + memberId)
         logger.debug(str(e))
+        db.close()
         
       if curs.rowcount==1:
         account_status, name = curs.fetchone()
@@ -130,7 +131,9 @@ while(continue_reading):
           logger.info("Member %s status is not 'Active' (is %s)", memberId, str(account_status))
       else:
         logger.info("Could not find member %s in list.", memberId)
-          
+  
+      db.close()
+      
   # @TODO: trigger on inside input
   inside_input = get_inside_input()
   
